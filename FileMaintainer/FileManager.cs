@@ -109,7 +109,8 @@ namespace FileMaintainer
             var fileNumber = 0;
             foreach (var fileDir in filePaths)
             {
-                Console.WriteLine($"File {fileNumber}================");
+                Console.Write($"File {fileNumber}");
+                Console.Write(new string('=',40)+"\n");
 
                 Console.WriteLine($"Creation time: {File.GetCreationTime(fileDir)}");
                 Console.WriteLine($"Modification time: {File.GetLastWriteTime(fileDir)}");
@@ -129,10 +130,31 @@ namespace FileMaintainer
 
             foreach (var fileDir in filePaths)
             {
-                var fileText = File.ReadAllText(fileDir);
+                var shift = 0;
+                var found = false;
+                using var myStreamReader = new StreamReader(fileDir);
 
+                while (!myStreamReader.EndOfStream)
+                {
+                    var ch = myStreamReader.Read();
+                    if (ch == substring[shift])
+                    {
+                        if (shift + 1 == substring.Length)
+                        {
+                            found = true;
+                            break;
+                        }
+                        shift++;
+                    }
+                    else
+                    {
+                        shift = 0;
+                    }
+                }
 
-                Console.WriteLine(fileText.Contains(substring)
+                myStreamReader.Close();
+
+                Console.WriteLine(found
                     ? $"File {Path.GetFileName(fileDir)} contains sub-string"
                     : $"File {Path.GetFileName(fileDir)} doesn't contains sub-string");
             }
