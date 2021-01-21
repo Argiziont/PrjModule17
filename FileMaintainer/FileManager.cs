@@ -9,8 +9,14 @@ namespace FileMaintainer
         private static readonly string _gatheredName = "gathered.txt";
         private static readonly string _splitName = "split";
 
+        /// <summary>
+        ///     Creates one single file from multiple files
+        /// </summary>
+        /// <param name="inputFiles">Paths to files</param>
         public static void GatherFiles(params string[] inputFiles)
         {
+            if (inputFiles == null) throw new ArgumentNullException(nameof(inputFiles));
+
             const int chunkSize = 2 * 1024; // 2KB
 
             if (File.Exists(_gatheredName))
@@ -35,8 +41,17 @@ namespace FileMaintainer
             File.SetAttributes(_gatheredName, FileAttributes.ReadOnly);
         }
 
+        /// <summary>
+        ///     Splits file into different files by equal parts
+        /// </summary>
+        /// <param name="fileName">Paths to files</param>
+        /// <param name="parts">Number of parts</param>
         public static void SplitFiles(string fileName, int parts)
         {
+            if (fileName == null) throw new ArgumentNullException(nameof(fileName));
+
+            if (parts <= 0) throw new ArgumentOutOfRangeException(nameof(parts));
+
             using var input = File.OpenRead(fileName);
             var inputFileLength = input.Length;
             for (var i = 0; i < parts; i++)
@@ -62,8 +77,16 @@ namespace FileMaintainer
             }
         }
 
+        /// <summary>
+        ///     Deletes first entry of substring in file
+        /// </summary>
+        /// <param name="fileName">Paths to file</param>
+        /// <param name="substring">Substring to delete</param>
         public static void DeleteSubstring(string fileName, string substring)
         {
+            if (fileName == null) throw new ArgumentNullException(nameof(fileName));
+            if (substring == null) throw new ArgumentNullException(nameof(substring));
+
             //using var input = File.OpenWrite(fileName);
             var shift = 0;
             var found = false;
@@ -101,7 +124,11 @@ namespace FileMaintainer
             File.WriteAllText(fileName, text);
         }
 
-        public static void FileDataAndInfo(string fileMask)
+        /// <summary>
+        ///     Displays info about files in directory
+        /// </summary>
+        /// <param name="fileMask">Mask for files</param>
+        public static void FileDataAndInfo(string fileMask= "*.*")
         {
             var filePaths = Directory.GetFiles(Directory.GetCurrentDirectory(), "*.*",
                 SearchOption.AllDirectories);
@@ -110,7 +137,7 @@ namespace FileMaintainer
             foreach (var fileDir in filePaths)
             {
                 Console.Write($"File {fileNumber}");
-                Console.Write(new string('=',40)+"\n");
+                Console.Write(new string('=', 40) + "\n");
 
                 Console.WriteLine($"Creation time: {File.GetCreationTime(fileDir)}");
                 Console.WriteLine($"Modification time: {File.GetLastWriteTime(fileDir)}");
@@ -124,8 +151,17 @@ namespace FileMaintainer
             }
         }
 
-        public static void PrintTextFromFiles(string directory,SearchOption searchOption,string substring)
+        /// <summary>
+        ///     Takes text from found files and tries to find substring
+        /// </summary>
+        /// <param name="directory">Directory where to find</param>
+        /// <param name="searchOption">Search option for method</param>
+        /// <param name="substring">Substring to find</param>
+        public static void PrintTextFromFiles(string directory, SearchOption searchOption, string substring)
         {
+            if (directory == null) throw new ArgumentNullException(nameof(directory));
+            if (substring == null) throw new ArgumentNullException(nameof(substring));
+
             var filePaths = Directory.GetFiles(directory, "*.*", searchOption);
 
             foreach (var fileDir in filePaths)
@@ -144,6 +180,7 @@ namespace FileMaintainer
                             found = true;
                             break;
                         }
+
                         shift++;
                     }
                     else
